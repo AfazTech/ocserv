@@ -13,7 +13,7 @@ if ! grep -q "CentOS Linux release 7" /etc/centos-release; then
 fi
 
 # Check if SELinux is enabled and prompt the user to disable it
-if [ "$(getenforce)" != "Permissive" ]; then
+if [ "$(getenforce)" != "Disabled" ]; then
   echo "SELinux is enabled. Please run the following commands to disable it and then rerun this script:"
   echo "setenforce 0"
   echo "sed -i "s/enforcing/disabled/g" /etc/selinux/config"
@@ -43,7 +43,6 @@ systemctl enable ocserv
 
 # Prompt the user for input
 read -p "Please enter the ocserv port (example: 443): " ocserv_port
-read -p "Please enter your email: (example: abolfazlmajidi100@gmail.com) " email
 read -p "Please enter your domain (example: ocserv.domain.com): " domain
 read -p "Please enter the ibsng IP (example: 45.89.36.36): " ibsng_ip
 read -p "Please enter the ibsng secret (example: 123): " ibsng_secret
@@ -57,7 +56,7 @@ firewall-cmd --zone=public --add-masquerade --permanent
 systemctl reload firewalld
 
 # Obtain SSL certificate using certbot
-certbot certonly --standalone --preferred-challenges http --agree-tos --email $email -d $domain --cert-path /etc/pki/ocserv/public/server.crt --key-path /etc/pki/ocserv/private/server.key
+certbot certonly --standalone --preferred-challenges http --agree-tos --register-unsafely-without-email -d $domain --cert-path /etc/pki/ocserv/public/server.crt --key-path /etc/pki/ocserv/private/server.key
 
 # Check the exit status of the certbot command
 if [ $? -ne 0 ]; then
