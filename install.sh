@@ -20,10 +20,10 @@ if [ "$(getenforce)" != "Disabled" ]; then
   exit 1
 fi
 
-# Add nameserver 8.8.8.8 to the beginning of /etc/resolv.conf if it doesn't already exist
-if ! grep -q "nameserver 8.8.8.8" /etc/resolv.conf; then
-  sed -i "1inameserver 8.8.8.8" /etc/resolv.conf
-fi
+# # Add nameserver 8.8.8.8 to the beginning of /etc/resolv.conf if it doesn't already exist
+# if ! grep -q "nameserver 8.8.8.8" /etc/resolv.conf; then
+#   sed -i "1inameserver 8.8.8.8" /etc/resolv.conf
+# fi
 
 # Fix CentOS 7 repository
 yum remove epel-release -y
@@ -89,9 +89,6 @@ sysctl -p
 
 # Stop ocserv service and remove existing configuration files
 systemctl stop ocserv
-rm -f /etc/ocserv/ocserv.conf
-rm -f /etc/radcli/radiusclient.conf
-rm -f /etc/radcli/servers
 
 # Download and configure new ocserv and radiusclient configuration files
 curl -4 -v https://raw.githubusercontent.com/imafaz/ocserv/main/ocserv.conf -o /etc/ocserv/ocserv.conf
