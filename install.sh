@@ -94,7 +94,7 @@ rm -f /etc/radcli/radiusclient.conf
 rm -f /etc/radcli/servers
 
 # Download and configure new ocserv and radiusclient configuration files
-curl  https://raw.githubusercontent.com/imafaz/ocserv/main/ocserv.conf -o /etc/ocserv/ocserv.conf
+curl -4 -v https://raw.githubusercontent.com/imafaz/ocserv/main/ocserv.conf -o /etc/ocserv/ocserv.conf
 sed -i "s/ocserv_port/$ocserv_port/g" /etc/ocserv/ocserv.conf
 curl -4 https://raw.githubusercontent.com/imafaz/ocserv/main/radiusclient.conf -o /etc/radcli/radiusclient.conf
 sed -i "s/ibsng_ip/$ibsng_ip/g" /etc/ocserv/ocserv.conf
