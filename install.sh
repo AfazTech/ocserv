@@ -20,10 +20,10 @@ if [ "$(getenforce)" != "Disabled" ]; then
   exit 1
 fi
 
-# # Add nameserver 8.8.8.8 to the beginning of /etc/resolv.conf if it doesn't already exist
-# if ! grep -q "nameserver 8.8.8.8" /etc/resolv.conf; then
-#   sed -i "1inameserver 8.8.8.8" /etc/resolv.conf
-# fi
+# Add nameserver 8.8.8.8 to the beginning of /etc/resolv.conf if it doesn't already exist
+if ! grep -q "nameserver 8.8.8.8" /etc/resolv.conf; then
+  sed -i "1inameserver 8.8.8.8" /etc/resolv.conf
+fi
 
 # Fix CentOS 7 repository
 yum remove epel-release -y
@@ -91,13 +91,13 @@ sysctl -p
 systemctl stop ocserv
 
 # Download and configure new ocserv and radiusclient configuration files
-curl -4 -v https://raw.githubusercontent.com/imafaz/ocserv/main/ocserv.conf -o /etc/ocserv/ocserv.conf
+curl -4 https://raw.githubusercontent.com/imafaz/ocserv/main/ocserv.conf -o /etc/ocserv/ocserv.conf
 sed -i "s/ocserv_port/$ocserv_port/g" /etc/ocserv/ocserv.conf
 curl -4 https://raw.githubusercontent.com/imafaz/ocserv/main/radiusclient.conf -o /etc/radcli/radiusclient.conf
 sed -i "s/ibsng_ip/$ibsng_ip/g" /etc/ocserv/ocserv.conf
 curl -4 https://raw.githubusercontent.com/imafaz/ocserv/main/servers -o /etc/radcli/servers
-sed -i "s/ibsng_ip/$ibsng_ip/g" /etc/ocserv/ocserv.conf
-sed -i "s/ibsng_secret/$ibsng_secret/g" /etc/ocserv/ocserv.conf
+sed -i "s/ibsng_ip/$ibsng_ip/g" /etc/radcli/servers
+sed -i "s/ibsng_secret/$ibsng_secret/g" /etc/radcli/servers
 
 # Start ocserv service
 systemctl start ocserv
