@@ -50,13 +50,12 @@ read -p "Please enter the ibsng secret (example: 123): " ibsng_secret
 # Configure firewall rules
 firewall-cmd --permanent --add-port=$ocserv_port/tcp
 firewall-cmd --permanent --add-port=$ocserv_port/udp
-firewall-cmd --permanent --add-port=80/tcp
 firewall-cmd --permanent --add-port=22/tcp
 firewall-cmd --zone=public --add-masquerade --permanent
 systemctl reload firewalld
 
 # Obtain SSL certificate using certbot
-certbot certonly --standalone --preferred-challenges http --agree-tos --register-unsafely-without-email -d $domain --cert-path /etc/pki/ocserv/public/server.crt --key-path /etc/pki/ocserv/private/server.key
+certbot certonly --manual --preferred-challenges dns --agree-tos --register-unsafely-without-email -d $domain --cert-path /etc/pki/ocserv/public/server.crt --key-path /etc/pki/ocserv/private/server.key
 
 # Check the exit status of the certbot command
 if [ $? -ne 0 ]; then
