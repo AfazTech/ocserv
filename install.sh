@@ -16,7 +16,7 @@ fi
 if [ "$(getenforce)" != "Disabled" ]; then
   echo "SELinux is enabled. Please run the following commands to disable it and then rerun this script:"
   echo "setenforce 0"
-  echo "sed -i "s/enforcing/disabled/g" /etc/selinux/config"
+  echo "sed -i 's/enforcing/disabled/g' /etc/selinux/config"
   exit 1
 fi
 
@@ -26,6 +26,7 @@ if ! grep -q "nameserver 8.8.8.8" /etc/resolv.conf; then
 fi
 
 # Fix CentOS 7 repository
+yum remove epel-release -y
 bash <(curl -s https://raw.githubusercontent.com/imafaz/awesome-scripts/main/fix-centos7-repository/main.sh)
 
 # Update system packages
@@ -35,6 +36,14 @@ yum update -y
 # Install necessary packages
 yum install epel-release -y
 yum install ocserv firewalld radcli certbot -y
+
+# Check if packages were installed successfully
+for package in epel-release ocserv firewalld radcli certbot; do
+  if ! rpm -q $package &>/dev/null; then
+    echo "The package $package was not installed correctly."
+    exit 1
+  fi
+done
 
 # Enable and start firewalld and ocserv services
 systemctl enable firewalld
@@ -54,13 +63,24 @@ firewall-cmd --permanent --add-port=22/tcp
 firewall-cmd --zone=public --add-masquerade --permanent
 systemctl reload firewalld
 
-# Obtain SSL certificate using certbot
-certbot certonly --manual --preferred-challenges dns --agree-tos --register-unsafely-without-email -d $domain --cert-path /etc/pki/ocserv/public/server.crt --key-path /etc/pki/ocserv/private/server.key
+# Check if SSL certificates already exist
+if [ -f "/etc/letsencrypt/live/$domain/fullchain.pem" ] && [ -f "/etc/letsencrypt/live/$domain/privkey.pem" ]; then
+  echo "SSL certificates already exist. Moving them to the appropriate locations."
+  cp /etc/letsencrypt/live/$domain/fullchain.pem /etc/pki/ocserv/public/server.crt
+  cp /etc/letsencrypt/live/$domain/privkey.pem /etc/pki/ocserv/private/server.key
+else
+  # Obtain SSL certificate using certbot
+  certbot certonly --manual --preferred-challenges dns --agree-tos --register-unsafely-without-email -d $domain
 
-# Check the exit status of the certbot command
-if [ $? -ne 0 ]; then
-    echo "The certbot command failed. Please resolve the issues and run the script again."
-    exit 1
+  # Check the exit status of the certbot command
+  if [ $? -ne 0 ]; then
+      echo "The certbot command failed. Please resolve the issues and run the script again."
+      exit 1
+  fi
+
+  # Move the obtained certificates to the appropriate locations
+  cp /etc/letsencrypt/live/$domain/fullchain.pem /etc/pki/ocserv/public/server.crt
+  cp /etc/letsencrypt/live/$domain/privkey.pem /etc/pki/ocserv/private/server.key
 fi
 
 # Enable IP forwarding
