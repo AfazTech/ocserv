@@ -1,33 +1,52 @@
 # OCServ (OpenConnect) Installation Script
 
 ## Overview
-The OCServ Installation Script is designed to simplify the installation and configuration of the OpenConnect VPN server (OCServ) with IBSNG Radius support on CentOS 7 systems.
+The OCServ Installation Script simplifies installation and configuration of OpenConnect VPN server (OCServ) with optional IBSNG Radius support on CentOS, AlmaLinux, Debian, Ubuntu, and Rocky Linux systems.
 
 ## Installation Guide
 
 ### Prerequisites
-- **Operating System**: CentOS 7
-- **User Privileges**: Root access is required for installation.
+- **Operating System**: CentOS, AlmaLinux, Debian, Ubuntu, Rocky Linux
+- **User Privileges**: Root access required.
 
 ### Quick Setup Steps
-To quickly install and configure OCServ on your CentOS 7 system, follow these steps using the `install.sh` script:
+Run this command to start the installation:
 
-1. **Run the Installation Command**:
-   ```bash
-   bash <(curl -s https://raw.githubusercontent.com/imafaz/ocserv/main/install.sh)
-   ```
+```bash
+bash <(curl -s https://raw.githubusercontent.com/AfazTech/ocserv/main/install.sh)
+```
 
-2. **Connect to Your OCServ Server**:
-   After installation, you can connect to your OCServ server using the following address:
-   ```
-   https://your-domain:your-port
-   ```
+Follow the prompts to enter:
 
-### IBSNG Installation
-To install IBSNG, please refer to the repository available at:
-[https://github.com/imafaz/IBSng](https://github.com/imafaz/IBSng)
+* OCServ port (e.g. 443)
+* Your domain name (e.g. vpn.example.com)
+* Authentication method:
 
-Follow the instructions provided in the repository for detailed installation steps.
+  * Local (ocpasswd)
+  * Linux PAM
+  * Radius with IBSNG (requires IBSNG IP and secret)
+
+### After Installation
+
+Connect to your OCServ server via:
+
+https://your-domain:your-port
+
+### IBSNG Radius Server
+
+To install and configure IBSNG Radius server, visit:
+[https://github.com/AfazTech/IBSng](https://github.com/AfazTech/IBSng)
+
+Follow the repository's instructions to set up IBSNG properly.
+
+## Notes
+
+* The script disables firewalld/ufw and uses iptables with appropriate rules.
+* SELinux must be disabled manually if active; the script will instruct you.
+* iptables rules are flushed and replaced to avoid conflicts.
+* IPv4 forwarding is enabled.
+* Certificates are managed using certbot with manual DNS challenge.
 
 ## License
-This project is licensed under the MIT License. For more information, please refer to the [LICENSE](LICENSE) file.
+
+MIT License. See [LICENSE](LICENSE) for details.
