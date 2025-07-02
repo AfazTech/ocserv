@@ -5,7 +5,7 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-if ! grep -qi 'debian\|ubuntu\|centos\|rhel\|rocky\|alma' /etc/os-release; then
+if ! grep -qi 'debian\|ubuntu\|centos\|rhel\|rocky\|fedora\|alma' /etc/os-release; then
   echo "Unsupported OS. This script supports Debian-based and RHEL-based systems."
   exit 1
 fi
@@ -51,7 +51,7 @@ if [[ "$ID_LIKE" == *debian* || "$ID" == *debian* || "$ID" == *ubuntu* ]]; then
   systemctl enable iptables 2>/dev/null
   systemctl start iptables 2>/dev/null
   radcliConfDir="/etc/radiusclient"
-elif [[ "$ID" == *centos* || "$ID" == *rhel* || "$ID" == *rocky* || "$ID" == *alma* ]]; then
+elif [[ "$ID" == *centos* || "$ID" == *rhel* || "$ID" == *rocky* || "$ID" == *alma* || "$ID" == *fedora* ]]; then
 yum install -y epel-release
   if [[ "$authChoice" == "3" ]]; then
     yum install -y ocserv iptables iptables-services radcli certbot curl
