@@ -13,6 +13,7 @@ fi
 if command -v getenforce &>/dev/null; then
   if [ "$(getenforce)" != "Disabled" ]; then
     echo "SELinux is enabled. Please run the following commands to disable it and then rerun this script:"
+    echo ""
     echo "sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config && reboot"
     exit 1
   fi
@@ -77,15 +78,19 @@ iptables -t nat -F
 iptables -t nat -X
 iptables -t mangle -F
 iptables -t mangle -X
+
 iptables -P INPUT DROP
 iptables -P FORWARD ACCEPT
 iptables -P OUTPUT ACCEPT
+
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -p tcp --dport $ocserv_port -j ACCEPT
 iptables -A INPUT -p udp --dport $ocserv_port -j ACCEPT
 iptables -A INPUT -p tcp --dport 22 -j ACCEPT
 
 iface=$(ip route get 8.8.8.8 | awk '{for(i=1;i<=NF;i++) if ($i=="dev") print $(i+1)}')
 iptables -t nat -A POSTROUTING -o $iface -j MASQUERADE
+
 
 if command -v netfilter-persistent &>/dev/null; then
   netfilter-persistent save
